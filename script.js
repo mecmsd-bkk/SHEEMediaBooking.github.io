@@ -1,30 +1,35 @@
-// --- โค้ดสำหรับปุ่ม Collapsible ---
-var collapsibles = document.getElementsByClassName("collapsible");
+document.addEventListener('DOMContentLoaded', function () {
+    const accordionHeaders = document.querySelectorAll('.accordion-header');
 
-for (var i = 0; i < collapsibles.length; i++) {
-    collapsibles[i].addEventListener("click", function() {
-        this.classList.toggle("active");
-        var content = this.nextElementSibling;
-        if (content.style.maxHeight) {
-            content.style.maxHeight = null;
-        } else {
-            content.style.maxHeight = content.scrollHeight + "px";
-        }
-    });
-}
+    accordionHeaders.forEach(header => {
+        header.addEventListener('click', function () {
+            const currentItem = this.parentElement;
+            const isActive = currentItem.classList.contains('active');
 
-// --- โค้ดสำหรับ Scroll Animation ---
-const observer = new IntersectionObserver((entries) => {
-    // วนลูปสำหรับทุก entry ที่ observer ตรวจจับได้
-    entries.forEach((entry) => {
-        // ถ้า Element เข้ามาในหน้าจอ (isIntersecting)
-        if (entry.isIntersecting) {
-            // เพิ่มคลาส is-visible เพื่อเริ่ม animation
-            entry.target.classList.add('is-visible');
-        }
+            const activeItems = document.querySelectorAll('.accordion-item.active');
+            activeItems.forEach(item => {
+                if (item !== currentItem) {
+                    item.classList.remove('active');
+                    item.querySelector('.accordion-content').style.maxHeight = null;
+                    item.querySelector('.icon').textContent = '+';
+                }
+            });
+
+            if (isActive) {
+                currentItem.classList.remove('active');
+                this.nextElementSibling.style.maxHeight = null;
+                this.querySelector('.icon').textContent = '+';
+            } else {
+                currentItem.classList.add('active');
+                this.nextElementSibling.style.maxHeight = this.nextElementSibling.scrollHeight + "px";
+                this.querySelector('.icon').textContent = '-';
+            }
+        });
     });
+
+    const initiallyActiveItem = document.querySelector('.accordion-item.active');
+    if (initiallyActiveItem) {
+        const content = initiallyActiveItem.querySelector('.accordion-content');
+        content.style.maxHeight = content.scrollHeight + "px";
+    }
 });
-
-// เลือกทุก elements ที่มีคลาส fade-in-section มาให้ Observer คอยดู
-const elementsToFadeIn = document.querySelectorAll('.fade-in-section');
-elementsToFadeIn.forEach((el) => observer.observe(el));
